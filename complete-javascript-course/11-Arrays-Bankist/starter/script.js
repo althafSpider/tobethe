@@ -1,7 +1,5 @@
 'use strict';
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
 // BANKIST APP
 
 // Data
@@ -61,9 +59,7 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-// /////////////////////////////////////////////////
-// /////////////////////////////////////////////////
-// // LECTURES
+
 
 const currencies = new Map([
   ['USD', 'United States dollar'],
@@ -89,7 +85,6 @@ const displayMovements = function (movements) {
   });
 };
 
-displayMovements(account1.movements);
 
 const createUsername = function (accs) {
   accs.forEach(function (acc) {
@@ -108,19 +103,40 @@ const calcDisplayBalance = function (movements) {
   labelBalance.textContent = `${balance}€`;
 };
 
-calcDisplayBalance(account2.movements);
 
-const calcDisplaySummary = function (movment) {
-  const income = movment.filter(m => m > 0).reduce((acc, num) => acc + num, 0);
+
+const calcDisplaySummary = function (accounts) {
+  const income =accounts.movements.filter(m => m > 0).reduce((acc, num) => acc + num, 0);
   labelSumIn.textContent = `${income}€`;
-  const outcome = movment.filter(m => m < 0).reduce((acc, num) => acc + num, 0);
+  const outcome = accounts.movements.filter(m => m < 0).reduce((acc, num) => acc + num, 0);
   labelSumOut.textContent = `${Math.abs(outcome)}€`;
-  const interest = movment
+  const interest = accounts.movements
     .filter(m => m > 0)
-    .map(deposit => (deposit * 1.2) / 100)
+    .map(deposit => (deposit * accounts.interestRate) / 100)
     .filter(int => int >= 1)
     .reduce((acc, num) => acc + num, 0);
   labelSumInterest.textContent = `${interest}€`;
 };
 
-calcDisplaySummary(account1.movements);
+
+let currentAccount;
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value,
+  );
+  console.log(currentAccount);
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ')[0]}`;
+    containerApp.style.opacity = 1;
+
+      inputLoginUsername.value = inputLoginPin.value = '';
+      inputLoginPin.blur();
+
+    // display summary
+    calcDisplaySummary(currentAccount);
+    calcDisplayBalance(currentAccount.movements);
+    displayMovements(currentAccount.movements);
+
+  }
+});
