@@ -59,8 +59,6 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-
-
 const currencies = new Map([
   ['USD', 'United States dollar'],
   ['EUR', 'Euro'],
@@ -85,7 +83,6 @@ const displayMovements = function (movements) {
   });
 };
 
-
 const createUsername = function (accs) {
   accs.forEach(function (acc) {
     acc.username = acc.owner
@@ -98,17 +95,19 @@ const createUsername = function (accs) {
 
 createUsername(accounts);
 
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+const calcDisplayBalance = function (acc) {
+  const balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
   labelBalance.textContent = `${balance}€`;
 };
 
-
-
 const calcDisplaySummary = function (accounts) {
-  const income =accounts.movements.filter(m => m > 0).reduce((acc, num) => acc + num, 0);
+  const income = accounts.movements
+    .filter(m => m > 0)
+    .reduce((acc, num) => acc + num, 0);
   labelSumIn.textContent = `${income}€`;
-  const outcome = accounts.movements.filter(m => m < 0).reduce((acc, num) => acc + num, 0);
+  const outcome = accounts.movements
+    .filter(m => m < 0)
+    .reduce((acc, num) => acc + num, 0);
   labelSumOut.textContent = `${Math.abs(outcome)}€`;
   const interest = accounts.movements
     .filter(m => m > 0)
@@ -117,7 +116,6 @@ const calcDisplaySummary = function (accounts) {
     .reduce((acc, num) => acc + num, 0);
   labelSumInterest.textContent = `${interest}€`;
 };
-
 
 let currentAccount;
 btnLogin.addEventListener('click', function (e) {
@@ -130,13 +128,19 @@ btnLogin.addEventListener('click', function (e) {
     labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ')[0]}`;
     containerApp.style.opacity = 1;
 
-      inputLoginUsername.value = inputLoginPin.value = '';
-      inputLoginPin.blur();
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
 
     // display summary
     calcDisplaySummary(currentAccount);
-    calcDisplayBalance(currentAccount.movements);
+    calcDisplayBalance(currentAccount);
     displayMovements(currentAccount.movements);
-
   }
+});
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const recieverAcc = accounts.find(
+    acc => acc.username === inputTransferTo.value,
+  );
 });
